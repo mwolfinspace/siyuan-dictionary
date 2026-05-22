@@ -14,7 +14,7 @@ module.exports = class DictionaryPlugin extends Plugin {
     this.eventBus.off("open-menu-content", this._onOpenMenuContent);
   }
 
-  async onOpenMenuContent(event) {
+  onOpenMenuContent(event) {
     const range = event.detail.range;
     if (!range) return;
 
@@ -22,27 +22,30 @@ module.exports = class DictionaryPlugin extends Plugin {
     if (!text) return;
 
     const url = "https://translate.google.com/?sl=auto&tl=vi&text=" + encodeURIComponent(text) + "&op=translate";
+    const self = this;
 
-    let translation;
-    try {
-      translation = await this.translate(text);
-    } catch (e) {
-      event.detail.menu.addItem({ icon: "iconClose", label: "⚠️ Không có kết nối mạng", click: function () {} });
-      return;
-    }
+    const item = {
+      icon: "iconTranslate",
+      label: "Đang dịch...",
+      click: function () { window.open(url, "_blank"); },
+      bind: function (el) {
+        const labelEl = el.querySelector(".b3-menu__label");
+        if (!labelEl) return;
 
-    const item = { icon: "iconTranslate", label: translation, click: function () { window.open(url, "_blank"); } };
-    if (translation.length > 30) {
-      item.bind = function (el) {
-        var label = el.querySelector(".b3-menu__label");
-        if (label) {
-          label.style.whiteSpace = "normal";
-          label.style.wordBreak = "break-word";
-          label.style.maxWidth = "380px";
-          label.style.lineHeight = "1.4";
-        }
-      };
-    }
+        self.translate(text).then(function (translation) {
+          labelEl.textContent = translation;
+          if (translation.length > 30) {
+            labelEl.style.whiteSpace = "normal";
+            labelEl.style.wordBreak = "break-word";
+            labelEl.style.maxWidth = "380px";
+            labelEl.style.lineHeight = "1.4";
+          }
+        }).catch(function () {
+          labelEl.textContent = "⚠️ Không có kết nối mạng";
+        });
+      }
+    };
+
     event.detail.menu.addItem(item);
   }
 
