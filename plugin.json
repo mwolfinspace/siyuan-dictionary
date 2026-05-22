@@ -13,7 +13,6 @@
     "default": "Right-click any text to translate it to Vietnamese via Google Translate. Works offline with warning."
   },
   "readme": {
-    "default": "README_DICT.md",
-    "en_US": "README_DICT.md"
+    "default": "README_DICT.md"
   }
 }
