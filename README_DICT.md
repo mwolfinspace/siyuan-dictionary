@@ -1,6 +1,6 @@
-# Dictionary
+# Translate to Vietnamese
 
-Translate selected text to Vietnamese via right-click menu. Uses free Google Translate API.
+Right-click any text to translate it to Vietnamese via Google Translate. Works offline with warning.
 
 ## Features
 

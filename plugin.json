@@ -1,16 +1,16 @@
 {
-  "name": "dictionary",
+  "name": "siyuan-dictionary",
   "author": "Xedryk",
-  "url": "https://github.com/Xedryk/siyuan-dictionary",
+  "url": "https://github.com/mwolfinspace/siyuan-dictionary",
   "version": "1.0.0",
   "minAppVersion": "2.9.0",
   "backends": ["all"],
   "frontends": ["all"],
   "displayName": {
-    "default": "Dictionary"
+    "default": "Translate to Vietnamese"
   },
   "description": {
-    "default": "Translate selected text to Vietnamese via right-click menu. Uses free Google Translate API."
+    "default": "Right-click any text to translate it to Vietnamese via Google Translate. Works offline with warning."
   },
   "readme": {
     "default": "README_DICT.md",
