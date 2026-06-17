@@ -1,0 +1,18 @@
+{
+  "name": "siyuan-dictionary",
+  "author": "Xedryk",
+  "url": "https://github.com/mwolfinspace/siyuan-dictionary",
+  "version": "2.0.0",
+  "minAppVersion": "2.9.0",
+  "backends": ["all"],
+  "frontends": ["all"],
+  "displayName": {
+    "default": "Translate & Dictionary"
+  },
+  "description": {
+    "default": "Select text to show a popup toolbar with Google Search, Read Aloud, Dictionary lookup, and Translate to Vietnamese. Right-click any text to translate to Vietnamese via Google Translate."
+  },
+  "readme": {
+    "default": "README_DICT.md"
+  }
+}
