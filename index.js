@@ -27,7 +27,6 @@ module.exports = class DictionaryPlugin extends Plugin {
     this.toolbarEl = null;
     this.panelEl = null;
     this.selectedText = "";
-    this.overlayEl = null;
   }
 
   onunload() {
@@ -73,15 +72,6 @@ module.exports = class DictionaryPlugin extends Plugin {
       .dict-mark-menu button:hover {
         background: var(--b3-list-hover, #f0f0f0);
         color: var(--b3-theme-primary, #1a73e8);
-      }
-      .dict-overlay {
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 949;
-        background: transparent;
       }
       .dict-popup-panel {
         --sr-gap: 4px;
@@ -224,7 +214,7 @@ module.exports = class DictionaryPlugin extends Plugin {
   }
 
   _onKeyDown(e) {
-    if (e.key === "Escape") {
+    if (this.toolbarEl || this.panelEl) {
       this._removeToolbar();
       this._removePanel();
     }
@@ -236,7 +226,7 @@ module.exports = class DictionaryPlugin extends Plugin {
         this._removeToolbar();
         return;
       }
-      if (e.target && e.target.closest(".dict-mark-menu, .dict-popup-panel, .dict-overlay")) {
+      if (e.target && e.target.closest(".dict-mark-menu, .dict-popup-panel")) {
         return;
       }
       const sel = window.getSelection();
@@ -261,10 +251,6 @@ module.exports = class DictionaryPlugin extends Plugin {
       this.toolbarEl.remove();
       this.toolbarEl = null;
     }
-    if (this.overlayEl) {
-      this.overlayEl.remove();
-      this.overlayEl = null;
-    }
   }
 
   _removePanel() {
@@ -277,15 +263,6 @@ module.exports = class DictionaryPlugin extends Plugin {
   _showToolbar(rect, text) {
     this._removeToolbar();
     this._removePanel();
-
-    const overlay = document.createElement("div");
-    overlay.className = "dict-overlay";
-    overlay.addEventListener("mousedown", () => {
-      this._removeToolbar();
-      this._removePanel();
-    });
-    document.body.appendChild(overlay);
-    this.overlayEl = overlay;
 
     const toolbar = document.createElement("div");
     toolbar.className = "dict-mark-menu";
