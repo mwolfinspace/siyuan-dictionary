@@ -13,6 +13,15 @@ module.exports = class DictionaryPlugin extends Plugin {
     </symbol>
     <symbol id="iconBook" viewBox="0 0 24 24">
       <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H6V4h2v8l2.5-1.5L13 12V4h5v16z" fill="currentColor"/>
+    </symbol>
+    <symbol id="iconContentCut" viewBox="0 0 24 24">
+      <path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64zM6 8c-1.1 0-2-.89-2-2s.9-2 2-2 2 .89 2 2-.9 2-2 2zm0 12c-1.1 0-2-.89-2-2s.9-2 2-2 2 .89 2 2-.9 2-2 2z" fill="currentColor"/>
+    </symbol>
+    <symbol id="iconContentCopy" viewBox="0 0 24 24">
+      <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" fill="currentColor"/>
+    </symbol>
+    <symbol id="iconContentPaste" viewBox="0 0 24 24">
+      <path d="M19 2h-4.18C14.4.84 13.3 0 12 0S9.6.84 9.18 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z" fill="currentColor"/>
     </symbol>`);
 
     this._addStyles();
@@ -264,10 +273,20 @@ module.exports = class DictionaryPlugin extends Plugin {
     this._removeToolbar();
     this._removePanel();
 
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0) {
+      this._savedRange = sel.getRangeAt(0).cloneRange();
+    } else {
+      this._savedRange = null;
+    }
+
     const toolbar = document.createElement("div");
     toolbar.className = "dict-mark-menu";
 
     const buttons = [
+      { icon: "iconContentCut", title: "Cut", action: () => { this._execCut(text); this._removeToolbar(); } },
+      { icon: "iconContentCopy", title: "Copy", action: () => { this._execCopy(text); this._removeToolbar(); } },
+      { icon: "iconContentPaste", title: "Paste", action: () => { this._execPaste(); this._removeToolbar(); } },
       { icon: "iconSearch", title: "Search Google", action: () => { this._searchGoogle(text); this._removeToolbar(); } },
       { icon: "iconSpeaker", title: "Read Aloud", action: () => { this._showTtsPanel(text); this._removeToolbar(); } },
       { icon: "iconBook", title: "Dictionary", action: () => { this._showDictPanel(text); this._removeToolbar(); } },
@@ -335,6 +354,59 @@ module.exports = class DictionaryPlugin extends Plugin {
     head.appendChild(closeBtn);
 
     return head;
+  }
+
+  async _execCut(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+    this._restoreRange();
+    document.execCommand("delete");
+  }
+
+  async _execCopy(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+  }
+
+  async _execPaste() {
+    let clipboardText = "";
+    try {
+      clipboardText = await navigator.clipboard.readText();
+    } catch {
+      return;
+    }
+    if (clipboardText) {
+      this._restoreRange();
+      document.execCommand("insertText", false, clipboardText);
+    }
+  }
+
+  _restoreRange() {
+    if (!this._savedRange) return;
+    const sel = window.getSelection();
+    if (!sel) return;
+    sel.removeAllRanges();
+    sel.addRange(this._savedRange);
   }
 
   _searchGoogle(text) {
